@@ -2,336 +2,378 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VPN Premium Access</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Пётр VPN — Свободный Интернет</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
     <style>
         :root {
-            --primary-color: #00d2ff;
-            --secondary-color: #3a7bd5;
-            --bg-gradient: linear-gradient(-45deg, #0f0c29, #302b63, #24243e);
-            --glass-bg: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.2);
-            --text-color: #ffffff;
+            --primary: #00f2ea;
+            --secondary: #ff0050;
+            --bg-dark: #0b0b10;
+            --glass: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+            --text: #ffffff;
         }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--bg-gradient);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-            color: var(--text-color);
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 242, 234, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(255, 0, 80, 0.1) 0%, transparent 40%);
             overflow-x: hidden;
-            -webkit-tap-highlight-color: transparent;
+            line-height: 1.6;
         }
 
-        /* Анимация фона */
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* ЗАГРУЗОЧНЫЙ ЭКРАН */
-        #loader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #0f0c29;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            transition: opacity 0.5s ease;
-        }
-
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 3px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: var(--primary-color);
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .loader-text {
-            margin-top: 20px;
-            font-size: 14px;
-            letter-spacing: 2px;
-            opacity: 0.7;
-            text-transform: uppercase;
-        }
-
-        /* ОСНОВНОЙ КОНТЕНТ */
+        /* --- UI COMPONENTS --- */
         .container {
-            width: 100%;
-            max-width: 380px;
-            padding: 20px;
-            display: none; /* Скрыто до загрузки */
-            opacity: 0;
-            animation: fadeIn 0.8s forwards;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px;
         }
 
-        @keyframes fadeIn {
-            to { opacity: 1; }
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-            margin-top: 10px;
-        }
-
-        header h1 {
-            font-size: 28px;
-            margin: 0;
-            background: linear-gradient(to right, #00d2ff, #928DAB);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 800;
-        }
-
-        header p {
-            font-size: 14px;
-            opacity: 0.6;
-            margin-top: 5px;
-        }
-
-        /* КАРТОЧКИ (Стекло) */
-        .card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-            transition: transform 0.2s;
-        }
-
-        .card:active {
-            transform: scale(0.98);
-        }
-
-        .card-title {
-            display: flex;
-            align-items: center;
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: #fff;
-        }
-
-        .card-title i {
-            margin-right: 10px;
-            color: var(--primary-color);
-        }
-
-        /* КНОПКИ */
         .btn {
-            display: block;
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
+            display: inline-block;
+            padding: 12px 24px;
+            border-radius: 8px;
             font-weight: 600;
-            cursor: pointer;
-            text-align: center;
             text-decoration: none;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            box-sizing: border-box;
+            transition: 0.3s;
+            cursor: pointer;
+            border: none;
         }
 
         .btn-primary {
-            background: linear-gradient(90deg, #00d2ff 0%, #3a7bd5 100%);
-            color: white;
-            box-shadow: 0 4px 15px rgba(0, 210, 255, 0.4);
-        }
-
-        .btn-primary:hover {
-            box-shadow: 0 6px 20px rgba(0, 210, 255, 0.6);
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            margin-top: 10px;
-            border: 1px solid rgba(255,255,255,0.05);
+            background: linear-gradient(90deg, var(--primary), #00c2bb);
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 242, 234, 0.4);
         }
         
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 25px rgba(0, 242, 234, 0.6); }
+
+        .btn-outline {
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            background: transparent;
+        }
+        
+        .btn-outline:hover { background: rgba(0, 242, 234, 0.1); }
+
+        h1, h2, h3 { font-weight: 800; letter-spacing: -0.03em; }
+        .text-gradient {
+            background: linear-gradient(90deg, var(--primary), #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        /* ПОЛЕ С КЛЮЧОМ */
-        .key-container {
+        /* --- HEADER --- */
+        header {
+            padding: 20px 0;
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border);
+            background: rgba(11, 11, 16, 0.8);
+        }
+
+        .nav { display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 24px; font-weight: bold; color: var(--text); text-decoration: none; display: flex; align-items: center; gap: 10px; }
+        .logo i { color: var(--primary); }
+
+        /* --- HERO --- */
+        .hero {
+            padding: 80px 0;
+            text-align: center;
+        }
+
+        .hero h1 { font-size: clamp(40px, 8vw, 70px); margin-bottom: 20px; line-height: 1.1; }
+        .hero p { font-size: 18px; opacity: 0.7; max-width: 600px; margin: 0 auto 40px; }
+
+        /* --- PLATFORMS --- */
+        .platforms { padding: 50px 0; }
+        .platform-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .platform-card {
+            background: var(--glass);
+            border: 1px solid var(--border);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            text-decoration: none;
+            color: #fff;
+            transition: 0.3s;
+        }
+
+        .platform-card:hover { background: rgba(255,255,255,0.1); border-color: var(--primary); }
+        .platform-card i { font-size: 32px; margin-bottom: 10px; color: var(--primary); }
+        .platform-card span { display: block; font-size: 14px; opacity: 0.8; }
+
+        /* --- INSTRUCTIONS (TABS) --- */
+        .instructions { padding: 60px 0; background: rgba(0,0,0,0.2); }
+        .section-title { text-align: center; margin-bottom: 40px; font-size: 32px; }
+
+        .tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 30px; flex-wrap: wrap; }
+        .tab-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .tab-btn.active { background: var(--primary); color: #000; border-color: var(--primary); }
+
+        .tab-content { display: none; max-width: 700px; margin: 0 auto; background: var(--glass); padding: 30px; border-radius: 16px; border: 1px solid var(--border); }
+        .tab-content.active { display: block; animation: fadeIn 0.5s; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .step { display: flex; gap: 15px; margin-bottom: 20px; }
+        .step-num { 
+            background: var(--glass); width: 30px; height: 30px; 
+            display: flex; align-items: center; justify-content: center; 
+            border-radius: 50%; color: var(--primary); font-weight: bold; flex-shrink: 0; 
+        }
+
+        /* --- PRICING --- */
+        .pricing { padding: 60px 0; }
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .price-card {
+            background: var(--glass);
+            border: 1px solid var(--border);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
             position: relative;
             overflow: hidden;
         }
-
-        .key-box {
-            background: rgba(0, 0, 0, 0.4);
-            padding: 15px;
-            border-radius: 12px;
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-            color: #00ff88;
-            word-break: break-all;
-            margin-bottom: 15px;
-            border: 1px dashed rgba(255,255,255,0.2);
-            display: none;
-            animation: slideDown 0.4s ease;
+        
+        .price-card.featured { border-color: var(--primary); box-shadow: 0 0 20px rgba(0, 242, 234, 0.1); }
+        .price-card.featured::before {
+            content: "ХИТ"; position: absolute; top: 15px; right: -30px; background: var(--primary); color: #000;
+            padding: 5px 40px; transform: rotate(45deg); font-size: 12px; font-weight: bold;
         }
 
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Footer */
-        .footer {
-            text-align: center;
-            font-size: 12px;
-            opacity: 0.4;
-            margin-top: 30px;
-            padding-bottom: 20px;
-        }
+        .price { font-size: 36px; font-weight: 800; margin: 20px 0; }
+        .currency { font-size: 18px; font-weight: 400; opacity: 0.6; }
+        
+        /* --- FOOTER --- */
+        footer { text-align: center; padding: 40px 0; opacity: 0.5; font-size: 14px; border-top: 1px solid var(--border); margin-top: 40px;}
 
     </style>
 </head>
 <body>
 
-    <div id="loader">
-        <div class="spinner"></div>
-        <div class="loader-text">Загрузка VPN...</div>
-    </div>
-
-    <div class="container" id="mainContent">
-        
-        <header>
-            <h1>⚡ PRIVATE VPN</h1>
-            <p>Высокая скорость. Анонимность.</p>
-        </header>
-
-        <div class="card">
-            <div class="card-title">
-                <i class="fas fa-key"></i> Ваш доступ
-            </div>
-            <p style="font-size: 13px; opacity: 0.7; margin-bottom: 15px;">
-                Нажмите кнопку, чтобы сгенерировать персональный ключ доступа VLESS.
-            </p>
-            
-            <div class="key-container">
-                <div id="keyDisplay" class="key-box"></div>
-            </div>
-            
-            <button onclick="getKey()" class="btn btn-primary" id="mainBtn">
-                <i class="fas fa-bolt"></i> Получить ключ
-            </button>
+    <header>
+        <div class="container nav">
+            <a href="#" class="logo"><i class="fas fa-shield-alt"></i> ПЁТР VPN</a>
+            <a href="https://t.me/petr_stalin" class="btn btn-outline" style="padding: 8px 16px; font-size: 14px;">Поддержка</a>
         </div>
+    </header>
 
-        <div class="card">
-            <div class="card-title">
-                <i class="fas fa-download"></i> Приложения
-            </div>
-            <a href="https://hiddify.com/" target="_blank" class="btn btn-secondary">
-                <i class="fab fa-windows"></i> Скачать Happ (Hiddify)
+    <section class="hero">
+        <div class="container">
+            <h1>Скорость. Анонимность.<br><span class="text-gradient">Безопасность.</span></h1>
+            <p>VLESS Reality протокол нового поколения. Работает там, где другие заблокированы. Один ключ на все устройства.</p>
+            <a href="#pricing" class="btn btn-primary">🔥 Купить доступ</a>
+        </div>
+    </section>
+
+    <section class="platforms container">
+        <h2 style="text-align: center;">1. Скачайте приложение</h2>
+        <div class="platform-grid">
+            <a href="https://hiddify.com/" target="_blank" class="platform-card">
+                <i class="fab fa-windows"></i>
+                <span>Windows</span>
+                <div style="font-size: 11px; margin-top: 5px; opacity: 0.5;">Скачать Hiddify</div>
             </a>
-            <a href="https://play.google.com/store/apps/details?id=com.v2raytun.android" target="_blank" class="btn btn-secondary">
-                <i class="fab fa-android"></i> Скачать v2RayTun
+            <a href="https://play.google.com/store/apps/details?id=com.v2raytun.android" target="_blank" class="platform-card">
+                <i class="fab fa-android"></i>
+                <span>Android</span>
+                <div style="font-size: 11px; margin-top: 5px; opacity: 0.5;">Скачать v2RayTun</div>
+            </a>
+            <a href="https://apps.apple.com/us/app/hiddify-proxy-vpn/id6596588185" target="_blank" class="platform-card">
+                <i class="fab fa-apple"></i>
+                <span>iOS (iPhone)</span>
+                <div style="font-size: 11px; margin-top: 5px; opacity: 0.5;">Скачать Hiddify</div>
+            </a>
+            <a href="https://hiddify.com/" target="_blank" class="platform-card">
+                <i class="fab fa-apple"></i>
+                <span>macOS</span>
+                <div style="font-size: 11px; margin-top: 5px; opacity: 0.5;">Скачать Hiddify</div>
+            </a>
+            <a href="https://github.com/hiddify/hiddify-next/releases" target="_blank" class="platform-card">
+                <i class="fab fa-linux"></i>
+                <span>Linux</span>
+                <div style="font-size: 11px; margin-top: 5px; opacity: 0.5;">Скачать Hiddify</div>
             </a>
         </div>
+    </section>
 
-        <div class="card" style="text-align: center;">
-            <p style="margin: 0; font-size: 14px; opacity: 0.8;">Возникли вопросы?</p>
-            <button onclick="openSupport()" style="background: none; border: none; color: #00d2ff; cursor: pointer; font-size: 14px; margin-top: 5px; text-decoration: underline;">
-                Написать администратору
-            </button>
-        </div>
-
-        <div class="footer">
-            Secure connection powered by VLESS Reality
-        </div>
-    </div>
-
-<script>
-    const tg = window.Telegram.WebApp;
-    tg.expand(); // Раскрыть на весь экран
-    
-    // Настраиваем цвета темы Telegram
-    tg.setHeaderColor('#0f0c29'); // Цвет шапки под наш фон
-    tg.setBackgroundColor('#0f0c29');
-
-    // Логика загрузки
-    window.onload = function() {
-        setTimeout(() => {
-            const loader = document.getElementById('loader');
-            const content = document.getElementById('mainContent');
+    <section class="instructions">
+        <div class="container">
+            <h2 class="section-title">2. Настройте за 1 минуту</h2>
             
-            loader.style.opacity = '0';
-            setTimeout(() => {
-                loader.style.display = 'none';
-                content.style.display = 'block';
-            }, 500);
-        }, 1500); // Задержка 1.5 сек для красоты
-    };
+            <div class="tabs">
+                <button class="tab-btn active" onclick="openTab('android')">Android</button>
+                <button class="tab-btn" onclick="openTab('pc')">PC / Mac</button>
+                <button class="tab-btn" onclick="openTab('ios')">iOS (iPhone)</button>
+            </div>
 
-    // Фейковый ключ (замените на API позже)
-    const VPN_KEY = "vless://uuid-test-key@1.1.1.1:443?security=reality&sni=google.com&fp=chrome&type=tcp&flow=xtls-rprx-vision#My_Premium_VPN";
+            <div id="android" class="tab-content active">
+                <div class="step">
+                    <div class="step-num">1</div>
+                    <div>Откройте приложение <b>v2RayTun</b>.</div>
+                </div>
+                <div class="step">
+                    <div class="step-num">2</div>
+                    <div>Скопируйте ключ доступа (начинается на <code>vless://</code>), который вы купили.</div>
+                </div>
+                <div class="step">
+                    <div class="step-num">3</div>
+                    <div>В приложении нажмите <b>Импорт из буфера</b> (или значок +).</div>
+                </div>
+                <div class="step">
+                    <div class="step-num">4</div>
+                    <div>Нажмите кнопку подключения внизу. Готово! 🚀</div>
+                </div>
+            </div>
 
-    function getKey() {
-        const keyBox = document.getElementById('keyDisplay');
-        const btn = document.getElementById('mainBtn');
+            <div id="pc" class="tab-content">
+                <div class="step">
+                    <div class="step-num">1</div>
+                    <div>Установите и откройте <b>Hiddify (Happ)</b>.</div>
+                </div>
+                <div class="step">
+                    <div class="step-num">2</div>
+                    <div>Нажмите на большой <b>Плюс (+)</b> или кнопку "Новый профиль".</div>
+                </div>
+                <div class="step">
+                    <div class="step-num">3</div>
+                    <div>Ключ автоматически добавится из буфера обмена.</div>
+                </div>
+                <div class="step">
+                    <div class="step-num">4</div>
+                    <div>Нажмите большую кнопку <b>Connect</b> по центру.</div>
+                </div>
+            </div>
 
-        // Вибрация телефона (Haptic Feedback) - работает только в приложении ТГ
-        if (tg.HapticFeedback) {
-            tg.HapticFeedback.impactOccurred('medium');
-        }
+            <div id="ios" class="tab-content">
+                <div class="step">
+                    <div class="step-num">1</div>
+                    <div>Скачайте <b>Hiddify</b> из AppStore.</div>
+                </div>
+                <div class="step">
+                    <div class="step-num">2</div>
+                    <div>Скопируйте ваш ключ. Откройте приложение.</div>
+                </div>
+                <div class="step">
+                    <div class="step-num">3</div>
+                    <div>Приложение само предложит добавить ключ. Нажмите "Add".</div>
+                </div>
+                <div class="step">
+                    <div class="step-num">4</div>
+                    <div>Разрешите добавление конфигурации VPN. Подключайтесь!</div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-        // Показываем ключ с анимацией
-        keyBox.style.display = 'block';
-        keyBox.innerText = VPN_KEY;
-        
-        // Копируем
-        navigator.clipboard.writeText(VPN_KEY).then(() => {
-            tg.showPopup({
-                title: 'Успешно!',
-                message: 'Ключ скопирован в буфер обмена.',
-                buttons: [{type: 'ok'}]
+    <section id="pricing" class="pricing container">
+        <h2 class="section-title">3. Выберите тариф</h2>
+        <div class="pricing-grid">
+            <div class="price-card">
+                <h3>Тест-драйв</h3>
+                <div class="price">0₽ <span class="currency">/ 3 дня</span></div>
+                <ul style="list-style: none; text-align: left; opacity: 0.8; margin-bottom: 20px;">
+                    <li>✅ Полная скорость</li>
+                    <li>✅ Без ограничений трафика</li>
+                    <li>✅ 1 устройство</li>
+                </ul>
+                <a href="https://t.me/YOUR_BOT_USERNAME?start=buy_test" class="btn btn-outline" style="width: 100%">Попробовать</a>
+            </div>
+
+            <div class="price-card featured">
+                <h3>Стандарт</h3>
+                <div class="price">150₽ <span class="currency">/ мес</span></div>
+                <ul style="list-style: none; text-align: left; opacity: 0.8; margin-bottom: 20px;">
+                    <li>✅ Скорость до 1 Гбит/с</li>
+                    <li>✅ YouTube 4K без лагов</li>
+                    <li>✅ 5 устройств</li>
+                </ul>
+                <a href="https://t.me/YOUR_BOT_USERNAME?start=buy_month" class="btn btn-primary" style="width: 100%">Купить</a>
+            </div>
+
+            <div class="price-card">
+                <h3>VIP Год</h3>
+                <div class="price">1500₽ <span class="currency">/ год</span></div>
+                <ul style="list-style: none; text-align: left; opacity: 0.8; margin-bottom: 20px;">
+                    <li>✅ Выгода 20%</li>
+                    <li>✅ Приоритетная поддержка</li>
+                    <li>✅ 5 устройств</li>
+                </ul>
+                <a href="https://t.me/razrabotkaDPigr_bot?start=buy_year" class="btn btn-outline" style="width: 100%">Купить</a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Пётр VPN. All rights reserved.</p>
+            <p>Powered by VLESS Reality Technology</p>
+        </div>
+    </footer>
+
+    <script>
+        // Инициализация WebApp (чтобы сайт понимал, что он внутри ТГ)
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        // Логика переключения табов
+        function openTab(tabName) {
+            // Скрываем все табы
+            const contents = document.getElementsByClassName('tab-content');
+            for (let i = 0; i < contents.length; i++) {
+                contents[i].classList.remove('active');
+            }
+            
+            // Убираем подсветку кнопок
+            const buttons = document.getElementsByClassName('tab-btn');
+            for (let i = 0; i < buttons.length; i++) {
+                buttons[i].classList.remove('active');
+            }
+
+            // Показываем нужный
+            document.getElementById(tabName).classList.add('active');
+            
+            // Подсвечиваем нажатую кнопку (через event сложнее, сделаем перебор)
+            // Простой костыль для подсветки текущей кнопки:
+            const allBtns = document.querySelectorAll('.tab-btn');
+            allBtns.forEach(btn => {
+                if(btn.innerText.toLowerCase().includes(tabName === 'pc' ? 'pc' : tabName)) {
+                    btn.classList.add('active');
+                }
             });
-        });
-
-        // Меняем кнопку
-        btn.innerHTML = '<i class="fas fa-check"></i> Скопировано';
-        btn.style.background = 'linear-gradient(90deg, #11998e 0%, #38ef7d 100%)'; // Зеленый градиент
-        
-        setTimeout(() => {
-             btn.innerHTML = '<i class="fas fa-copy"></i> Скопировать снова';
-             btn.style.background = ''; // Возврат цвета
-        }, 3000);
-    }
-
-    function openSupport() {
-        tg.openTelegramLink('https://t.me/petr_stalin');
-    }
-</script>
-
+        }
+    </script>
 </body>
 </html>
